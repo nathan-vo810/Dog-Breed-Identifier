@@ -114,7 +114,9 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     model.load_state_dict(best_model_wts)
     return model
 
-model = models.resnet50(pretrained=True)
+model = models.wide_resnet50_2(pretrained=True)
+for param in model.parameters():
+    param.requires_grad = False
 
 num_features = model.fc.in_features
 
