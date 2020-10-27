@@ -35,17 +35,20 @@ def predict_image(model, image_name):
 	input = input.to(device)
 
 	output = model(input)
+	p = torch.nn.functional.softmax(output, dim=1)
+	p = p.data.cpu().numpy()
 
-	index = output.data.cpu().numpy().argmax()
-	return index
+	return p[0], p[0].argsort()[-5:][::-1]
 
 def main():
 	model = prepare_model()
 	class_names = get_class_names()
 
 	image_name = './dataset/test/0a3f1f6f5f0ede7ea6e27427994d5f62.jpg'
-	index = predict_image(model, image_name)
-	print("Predicted: ", class_names[index])
+	probabilities, top5_indexes = predict_image(model, image_name)
+
+	for i, index in enumerate(top5_indexes):
+		print("{} - {}, Confident: {}".format(i+1, class_names[index], probabilities[index]))
 
 
 if __name__ == '__main__':

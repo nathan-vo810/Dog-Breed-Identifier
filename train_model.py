@@ -26,17 +26,6 @@ def prepare_data(data_dir, batch_size):
 
 	return dataloaders, dataset_sizes, class_names
 
-def imshow(inp, title=None):
-    """Imshow for Tensor."""
-    inp = inp.numpy().transpose((1, 2, 0))
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    inp = std * inp + mean
-    inp = np.clip(inp, 0, 1)
-    plt.imshow(inp)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
 
 def train_model(device, model, dataloaders, dataset_sizes, criterion, optimizer, scheduler, num_epochs=25):
     since = time.time()
@@ -106,6 +95,7 @@ def train_model(device, model, dataloaders, dataset_sizes, criterion, optimizer,
     model.load_state_dict(best_model_wts)
     return model
 
+
 def get_args():
 	# # Create parser object
     parser = argparse.ArgumentParser(description="CLI for Dog Breed Classifier")
@@ -148,7 +138,7 @@ def main():
 		model = models.inception_v3(pretrained=True)
 	else:
 		model = models.wide_resnet50_2(pretrained=True)
-		
+
 	for param in model.parameters():
 	    param.requires_grad = False
 
@@ -167,6 +157,7 @@ def main():
 
 	# Save Model
 	torch.save(my_model.state_dict(), "./best_weights.pth")
+
 
 if __name__ == '__main__':
 	main()
