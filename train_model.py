@@ -148,6 +148,7 @@ def main():
 		model = models.inception_v3(pretrained=True)
 	else:
 		model = models.wide_resnet50_2(pretrained=True)
+		
 	for param in model.parameters():
 	    param.requires_grad = False
 
