@@ -1,32 +1,25 @@
 import time
 import numpy as np
 import pandas as pd
-import datetime as dt
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import ImageGrid
-from os import listdir, makedirs, getcwd, remove
-from os.path import isfile, join, abspath, exists, isdir, expanduser
-from PIL import Image
+from os.path import join
 import torch
 from torch.optim import lr_scheduler
-from torch.autograd import Variable
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 import torchvision
 from torchvision import transforms, datasets, models
 import copy
 import argparse
 
-def prepare_data():
+def prepare_data(data_dir, batch_size):
 	data_transform = transforms.Compose([transforms.Scale(224),
 	                               transforms.CenterCrop(224),
 	                               transforms.ToTensor(),
 	                               transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
-	data_dir = './dataset'
-
 	image_datasets = {x: datasets.ImageFolder(join(data_dir, x), data_transform) for x in ['train', 'valid']}
 
-	dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,shuffle=True, num_workers=4) for x in ['train', 'valid']}
+	dataloaders = {x: DataLoader(image_datasets[x], batch_size=batch_size,shuffle=True, num_workers=4) for x in ['train', 'valid']}
 
 	dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'valid']}
 	class_names = image_datasets['train'].classes
@@ -121,8 +114,12 @@ def get_args():
                         metavar="model", default='ResNet18', choices={'ResNet18', 'ResNet50', 'Wide_ResNet', 'Inception_v3'},
                         help='Choose model type - ResNet18/ResNet50/Wide_ResNet/Inception_v3')
 
-    parser.add_argument('-num_epochs', type=int,
-    					metavar="num_epochs", default=1)
+    parser.add_argument('-batch_size', type=int, metavar="batch_size", default=4)
+
+    parser.add_argument('-num_epochs', type=int, metavar="num_epochs", default=1)
+
+    parser.add_argument('-lr', type=float, metavar="learning_rate", default=0.001)
+
     args = parser.parse_args()
     return args
 
@@ -138,10 +135,11 @@ def main():
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 	# Prepare Data
-	dataloaders, dataset_sizes, class_names = prepare_data()
+	data_dir = './dataset'
+	dataloaders, dataset_sizes, class_names = prepare_data(data_dir=data_dir, batch_size=args.batch_size)
 
 	# Prepare Model
-	print("Using Model ", args.model)
+	print("Using Model", args.model)
 	if args.model == 'ResNet18':
 		model = models.resnet18(pretrained=True)
 	elif args.model == 'ResNet50':	
@@ -160,7 +158,7 @@ def main():
 	model = model.to(device)
 
 	criterion = torch.nn.CrossEntropyLoss()
-	optimizer = torch.optim.SGD(model.fc.parameters(), lr=0.001, momentum=0.9)
+	optimizer = torch.optim.SGD(model.fc.parameters(), lr=args.lr, momentum=0.9)
 	exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
 	# Train Model
