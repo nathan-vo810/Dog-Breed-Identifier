@@ -129,3 +129,5 @@ optimizer = torch.optim.SGD(model.fc.parameters(), lr=0.001, momentum=0.9)
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
 my_model = train_model(model, criterion, optimizer, exp_lr_scheduler, num_epochs=25)
+
+torch.save(my_model.state_dict(), "./best_weights.pth")
