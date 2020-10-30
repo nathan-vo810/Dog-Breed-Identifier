@@ -2,7 +2,7 @@ import React from 'react';
 import Uploader from "./Uploader";
 import {Paper, Typography} from "@material-ui/core"
 import withStyles from "@material-ui/core/styles/withStyles";
-
+import socketIOClient from "socket.io-client"
 import Image from './bg.jpg'
 
 const styles = () => ({
@@ -16,6 +16,15 @@ const styles = () => ({
 })
 
 class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.socket = socketIOClient("0.0.0.0:4001")
+    }
+
+    componentDidMount() {
+        this.socket.emit("subscribe", 0)
+    }
+
     render() {
 
         const {classes} = this.props;
