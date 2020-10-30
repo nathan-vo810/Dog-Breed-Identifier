@@ -29,14 +29,15 @@ class Classifier(Process):
 				else:
 					print("Received data!")
 					probabilities, top5_indexes = self.model.predict(data)
-					for i, index in enumerate(top5_indexes):
-						print("{} - {}, Confident: {}".format(i+1, self.class_names[index], probabilities[index]))
-					self._return_result(probabilities, top5_indexes)
+					if probabilities is not None:
+						self._return_result(probabilities, top5_indexes)
+					else:
+						self._redis.publish("identifier_result", "NO DOG!")
 			except Exception as e:
 				print(e)
 
 	def _return_result(self, probabilities, top5_indexes):
-		message = '\n'.join('{}: {}'.format(self.class_names[index], probabilities[index]) for index in top5_indexes)
+		message = '\n'.join('{}: {}'.format(self.class_names[index], probabilities[index]) for index in top5_indexes if probabilities[index] > 1e-2)
 		self._redis.publish("identifier_result", message)
 
 	def _prepare_model(self):

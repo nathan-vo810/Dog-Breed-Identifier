@@ -22,7 +22,6 @@ def upload_files():
 	for _, file in files.items():
 		img = Image.open(file).convert("RGB")
 		_redis.push_queue_obj("queue:identifier", img)
-		print("Pushed to queue")
 	return jsonify("Uploaded!")
 
 def _start():

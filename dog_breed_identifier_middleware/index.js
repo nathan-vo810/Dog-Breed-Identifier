@@ -25,16 +25,21 @@ const server = http.createServer(app);
 const io = socketIo(server)
 const redisURL = "redis://0.0.0.0:6379"
 
+let subscribed = false
+
 function onConnect(socket) {
 	const subscriber = redis.createClient(redisURL);
 	subscriber.on("message", (channel, message) => {
-		console.log(message)
+		io.sockets.emit("result", message)
 	})
 
 	socket.on("subscribe", function() {
 		channel = 'identifier_result'
-		subscriber.subscribe(channel)
-		console.log("Subscribed to channel: " + channel)
+		if (!subscribed) {
+			subscribed = true
+			subscriber.subscribe(channel)
+			console.log("Subscribed to channel: " + channel)
+		}
 	})
 }
 
