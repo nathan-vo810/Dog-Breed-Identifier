@@ -2,7 +2,7 @@ import pickle
 import redis
 
 class RedisClient:
-	def __init__(self, host='0.0.0.0', port=6379):
+	def __init__(self, host='redis', port=6379):
 		self._redis = redis.StrictRedis(host, port)
 
 	def set_string(self, key, value):

@@ -1,0 +1,18 @@
+version: '3'
+services:
+  redis: 
+    image: redis:latest
+  backend:
+    image: anhvnn810/dog_breed_identifier_backend:pytorch
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"
+  web: 
+    image: anhvnn810/dog_breed_identifier_web
+    expose:
+      - "4001"
+    ports:
+      - "4001:4001"
+    links:
+      - backend

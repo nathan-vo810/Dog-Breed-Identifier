@@ -15,7 +15,7 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.static(path.join(__dirname, '../dog_breed_identifier_web/build')));
-app.get("/", (req, res) => {
+app.get(["/"], (req, res) => {
 	res.sendFile(path.join(__dirname, '../dog_breed_identifier_web/build/index.html'))
 })
 
@@ -23,12 +23,11 @@ app.get("/", (req, res) => {
 const server = http.createServer(app);
 
 const io = socketIo(server)
-const redisURL = "redis://0.0.0.0:6379"
 
 let subscribed = false
 
 function onConnect(socket) {
-	const subscriber = redis.createClient(redisURL);
+	const subscriber = redis.createClient({host: 'redis', port: 6379});
 	subscriber.on("message", (channel, message) => {
 		io.sockets.emit("result", message)
 	})

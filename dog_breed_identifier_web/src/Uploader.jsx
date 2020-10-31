@@ -32,7 +32,10 @@ class Uploader extends Component {
         })
 
         axios.post("http://localhost:5000/upload", data, {
-            headers: {"Content-Type": "multipart/form-data"},
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "accepts": "application/json"
+            },
         }).then(res => {
             this.setState({pendingResult: true})
         }).catch(err => {

@@ -1,0 +1,4 @@
+model/wide_resnet_880626.pth
+*__pycache__*
+notebooks
+dataset
